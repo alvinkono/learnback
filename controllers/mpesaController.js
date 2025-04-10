@@ -52,29 +52,19 @@ const initiateStkPush = async (req, res) => {
     const stkRes = await axios.post(
       'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest',
       {
-        BusinessShortCode: "174379",
-        Password: "base64encodedpassword",
-        Timestamp: "20250410154500",
-        TransactionType: "CustomerPayBillOnline",
-        Amount: 10,
-        PartyA: "254708374149",
-        PartyB: "174379",
-        PhoneNumber: "254708374149",
-        CallBackURL: "https://mydomain.com/callback",
-        AccountReference: "Test123",
-        TransactionDesc: "Test Payment"
-        
-        //BusinessShortCode: process.env.MPESA_SHORTCODE,
-        //Password: password,
-        //Timestamp: timestamp,
-        //TransactionType: 'CustomerPayBillOnline',
-        //Amount: amount,
-        //PartyA: phone,
-        //PartyB: process.env.MPESA_SHORTCODE,
-        //PhoneNumber: phone,
-        //CallBackURL: process.env.MPESA_CALLBACK_URL,
-        //AccountReference: 'ProductShop',
-        //TransactionDesc: 'Product Order Payment'
+
+        BusinessShortCode: process.env.MPESA_SHORTCODE,
+        Password: password,
+        Timestamp: timestamp,
+        TransactionType: 'CustomerPayBillOnline',
+        Amount: amount,
+        PartyA: phone,
+        PartyB: process.env.MPESA_SHORTCODE,
+        PhoneNumber: phone,
+        CallBackURL: process.env.MPESA_CALLBACK_URL,
+        AccountReference: 'ProductShop',
+        TransactionDesc: 'Product Order Payment'
+      
       },
       {
         headers: {
@@ -110,7 +100,7 @@ const initiateStkPush = async (req, res) => {
   } catch (err) {
 
     if (err.response) {
-      console.error("STK ERROR RESPONSE:", err.response.data);
+      console.error("STK ERROR RESPONSE:", err.stkRes.data);
       console.error("STK STATUS:", err.response.status);
       console.error("STK HEADERS:", err.response.headers);
     } else {

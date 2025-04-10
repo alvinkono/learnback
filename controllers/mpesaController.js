@@ -75,9 +75,43 @@ const initiateStkPush = async (req, res) => {
 
     res.json(stkRes.data);
   } catch (err) {
-    console.error(err.response?.data || err.message);
+    console.error('STK ERROR',err.response?.data || err.message);
     res.status(500).json({ error: 'M-PESA STK Push failed' });
   }
 };
 
-module.exports = { initiateStkPush };
+const handleCallback = async (req, res) => {
+  try {
+    console.log('M-PESA CALLBACK:', JSON.stringify(req.body, null, 2));
+
+    // Optionally extract useful data
+    const {
+      Body: {
+        stkCallback: {
+          ResultCode,
+          ResultDesc,
+          CallbackMetadata,
+        },
+      },
+    } = req.body;
+
+    if (ResultCode === 0) {
+      const phone = CallbackMetadata.Item.find(i => i.Name === 'PhoneNumber')?.Value;
+      const amount = CallbackMetadata.Item.find(i => i.Name === 'Amount')?.Value;
+
+      console.log(`✅ Payment success. Phone: ${phone}, Amount: ${amount}`);
+
+      // You can update order status in DB or trigger email here
+    } else {
+      console.log(`❌ Payment failed: ${ResultDesc}`);
+    }
+
+    res.status(200).json({ message: 'Callback received' });
+  } catch (err) {
+    console.error('Error in callback handler:', err.message);
+    res.status(500).json({ error: 'Callback handler error' });
+  }
+};
+
+
+module.exports = { initiateStkPush, handleCallback };

@@ -100,7 +100,7 @@ const initiateStkPush = async (req, res) => {
   } catch (err) {
 
     if (err.response) {
-      console.error("STK ERROR RESPONSE:", err.stkRes.data);
+      console.error("STK ERROR RESPONSE:", err.data);
       console.error("STK STATUS:", err.response.status);
       console.error("STK HEADERS:", err.response.headers);
     } else {

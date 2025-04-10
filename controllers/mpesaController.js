@@ -3,7 +3,10 @@ require('dotenv').config();
 const twilio = require('twilio');
 
 const generatePassword = () => {
-  const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, '').slice(0, 14);
+  const timestamp = new Date()
+  .toISOString()
+  .replace(/[-T:.Z]/g, '')
+  .slice(0, 14);
   const passStr = `${process.env.MPESA_SHORTCODE}${process.env.MPESA_PASSKEY}${timestamp}`;
   const password = Buffer.from(passStr).toString('base64');
   return { password, timestamp };
@@ -44,6 +47,7 @@ const initiateStkPush = async (req, res) => {
       }
     );
     const token = tokenRes.data.access_token;
+    console.log("M-Pesa Access Token:", token);
 
     const stkRes = await axios.post(
       'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest',
@@ -62,7 +66,8 @@ const initiateStkPush = async (req, res) => {
       },
       {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         }
       }
     );

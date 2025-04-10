@@ -1,5 +1,6 @@
 const axios = require('axios');
 require('dotenv').config();
+const twilio = require('twilio');
 
 const generatePassword = () => {
   const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, '').slice(0, 14);
@@ -7,6 +8,26 @@ const generatePassword = () => {
   const password = Buffer.from(passStr).toString('base64');
   return { password, timestamp };
 };
+
+
+
+// Set up Twilio client
+const client = new twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+
+// Send SMS notification to the customer
+const sendSmsNotification = async (phone, message) => {
+  try {
+    await client.messages.create({
+      body: message,
+      from: process.env.TWILIO_PHONE_NUMBER, // Twilio number
+      to: phone,
+    });
+    console.log('SMS sent successfully!');
+  } catch (err) {
+    console.error('Error sending SMS:', err);
+  }
+};
+
 
 const initiateStkPush = async (req, res) => {
   const { phone, amount } = req.body;
@@ -45,6 +66,12 @@ const initiateStkPush = async (req, res) => {
         }
       }
     );
+
+    // Check if payment was successful (simulate payment confirmation)
+    if (stkRes.data.ResponseCode === '0') {
+        // Send SMS confirmation to the customer
+        await sendSmsNotification(phone, `Your payment of KES ${amount} for FlowerShop order was successful! Thank you for shopping with us.`);
+    }
 
     res.json(stkRes.data);
   } catch (err) {

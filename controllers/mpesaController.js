@@ -73,9 +73,34 @@ const initiateStkPush = async (req, res) => {
         await sendSmsNotification(phone, `Your payment of KES ${amount} for FlowerShop order was successful! Thank you for shopping with us.`);
     }
 
+    console.log("Access Token:", token);
+    console.log("STK Payload:", {
+    BusinessShortCode: process.env.MPESA_SHORTCODE,
+    Password: password,
+    Timestamp: timestamp,
+    TransactionType: 'CustomerPayBillOnline',
+    Amount: amount,
+    PartyA: phone,
+    PartyB: process.env.MPESA_SHORTCODE,
+    PhoneNumber: phone,
+    CallBackURL: process.env.MPESA_CALLBACK_URL,
+    AccountReference: 'ProductShop',
+    TransactionDesc: 'Product Order Payment'
+    });
+
+
     res.json(stkRes.data);
   } catch (err) {
-    console.error('STK ERROR',err.response?.data || err.message);
+
+    if (err.response) {
+      console.error("STK ERROR RESPONSE:", err.response.data);
+      console.error("STK STATUS:", err.response.status);
+      console.error("STK HEADERS:", err.response.headers);
+    } else {
+      console.error("STK GENERAL ERROR:", err.message);
+    }
+    
+    //console.error('STK ERROR',err.response?.data || err.message);
     res.status(500).json({ error: 'M-PESA STK Push failed' });
   }
 };
